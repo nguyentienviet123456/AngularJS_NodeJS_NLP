@@ -13,7 +13,9 @@
     "angular-route": "^1.5.8",
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "vntk": "^1.0.0",
+    "yeuai": "^0.9.3"
   },
   "devDependencies": {
     "browser-sync": "^2.18.2",

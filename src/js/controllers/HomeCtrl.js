@@ -1,7 +1,7 @@
 angular.module('helloWorldApp')
 .controller('HomeCtrl', [
-    '$scope',
-    function($scope) {
+    '$scope','homeServices',
+    function($scope, homeServices) {
       $scope.srcImage = "images/mic.gif";
       //startregion variable
       var ignore_onend;
@@ -118,8 +118,6 @@ angular.module('helloWorldApp')
           $scope.final_span = linebreak($scope.final_transcript);
           $scope.interim_span = linebreak(interim_transcript);
           $("#final_span").html($scope.final_transcript);
-         
-          console.log($scope.interim_span);
           if($scope.final_transcript || interim_transcript){
             $scope.inlineBlock = true;
           }
@@ -136,13 +134,23 @@ angular.module('helloWorldApp')
           ignore_onend = false;
           $scope.final_span = '';
           $("#final_span").html('');
-         
           $scope.interim_span = '';
           $scope.srcImage = "images/mic-animate.gif";
           $scope.infoAllow = true;
           $scope.showBUtton = false;
           start_timestamp = event.timeStamp;
         }
+
+        $scope.getClassification = function(){
+          homeServices.classification({text: $scope.final_transcript}).then(function(response){
+            if(response.data !== null && response.data !== undefined){
+              $scope.model = response.data;
+              console.log( $scope.model);
+            };
+          }, function( err){
+            return false;
+          });
+        };
       }
     }
 ]);

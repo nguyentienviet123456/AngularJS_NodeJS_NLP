@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-
+const api = require('./server/routes/api');
 //port number
 //const port = 3000;
 const app = express();
@@ -15,7 +15,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 //body parser middleware
 app.use(bodyParser.json());
 // passport middleware
-
+//route
+app.use('/api', api);
 //index route
 app.get('*',(req,res) => {
     res.sendFile(path.join(__dirname, 'dist/views/index.html'));

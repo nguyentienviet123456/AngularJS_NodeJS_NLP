@@ -35118,11 +35118,11 @@ function ngViewFillContentFactory($compile, $controller, $route) {
 })(window, window.angular);
 
 angular.module('helloWorldApp', [
-    'ngRoute'
+    'ngRoute','apiHelper'
 ])
 .config([
     '$routeProvider',
-    function($routeProvider) {
+    function($routeProvider, apiHelper) {
         $routeProvider
             .when('/', {
                 templateUrl: 'views/home.html',
@@ -35133,8 +35133,8 @@ angular.module('helloWorldApp', [
 
 angular.module('helloWorldApp')
 .controller('HomeCtrl', [
-    '$scope',
-    function($scope) {
+    '$scope','homeServices',
+    function($scope, homeServices) {
       $scope.srcImage = "images/mic.gif";
       //startregion variable
       var ignore_onend;
@@ -35251,8 +35251,6 @@ angular.module('helloWorldApp')
           $scope.final_span = linebreak($scope.final_transcript);
           $scope.interim_span = linebreak(interim_transcript);
           $("#final_span").html($scope.final_transcript);
-         
-          console.log($scope.interim_span);
           if($scope.final_transcript || interim_transcript){
             $scope.inlineBlock = true;
           }
@@ -35269,13 +35267,257 @@ angular.module('helloWorldApp')
           ignore_onend = false;
           $scope.final_span = '';
           $("#final_span").html('');
-         
           $scope.interim_span = '';
           $scope.srcImage = "images/mic-animate.gif";
           $scope.infoAllow = true;
           $scope.showBUtton = false;
           start_timestamp = event.timeStamp;
         }
+
+        $scope.getClassification = function(){
+          homeServices.classification({text: $scope.final_transcript}).then(function(response){
+            if(response.data !== null && response.data !== undefined){
+              $scope.model = response.data;
+              console.log( $scope.model);
+            };
+          }, function( err){
+            return false;
+          });
+        };
       }
     }
 ]);
+
+var apiHelper = angular.module('apiHelper', []);
+
+apiHelper.factory("apiHelper",['$http', '$q', '$window', function($http, $q, $window){
+    var apiHelperFactory = {};
+// get
+    var _get = function( url, dataJson, headers){
+
+        var options = {
+            url: url,
+            method: 'GET',
+            data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+        };
+
+        if( headers !== null && headers !== undefined){
+            options = {
+                url: url,
+                method: 'GET',
+                data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                headers: headers
+            };
+        }
+
+        var deferred = $q.defer();
+
+        $http(options).then(function (response) {
+            if (response !== null && response !== undefined && response.data !== null && response.data.statusCode !== null && response.data.statusCode === 201) {
+                deferred.resolve(response);
+            }
+            else {
+                if (response !== null && response !== undefined && response.data !== null && response.data !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                    deferred.resolve(response);
+                }
+                else {
+                    deferred.reject({ status: false, message: '' });
+                }
+            }
+        }, function (error) {
+            if (error.data !== null && error.data.statusCode === 190) {
+               return false;
+            }
+            else {
+                deferred.reject(_getError(error));
+            }
+        });
+
+        return deferred.promise;
+    };
+// post
+var _post = function (url, dataJson, headers) {
+    
+            var options = {
+                url: url,
+                method: 'POST',
+                data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                headers: {
+                    'Content-type': 'application/json;charset=utf-8'
+                }
+            };
+    
+            if (headers !== null && headers !== undefined) {
+                options = {
+                    url: url,
+                    method: 'POST',
+                    data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                    headers: headers
+                };
+            }
+    
+            var deferred = $q.defer();
+    
+            $http(options).then(function (response) {
+                if (response !== null && response !== undefined && response.data.statusCode !== null && response.data.statusCode !== undefined && response.data.statusCode === 201) {
+                    deferred.resolve(response);
+                }
+                else {
+                    if (response !== null && response !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                        deferred.resolve(response);
+                    }
+                    else {
+                        deferred.reject({ status: false, message: response.data.message });
+                    }
+                }
+            }, function (error) {
+                if (error.data !== null && error.data.statusCode === 190) {
+                    return false;
+                 }
+                 else {
+                     deferred.reject(_getError(error));
+                 }
+            });
+    
+            return deferred.promise;
+        };
+// put
+var _put = function (url, dataJson, headers) {
+    
+            var options = {
+                url: url,
+                method: 'PUT',
+                data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                headers: {
+                    'Content-type': 'application/json;charset=utf-8'
+                }
+            };
+    
+            if (headers !== null && headers !== undefined) {
+                options = {
+                    url: url,
+                    method: 'PUT',
+                    data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                    headers: headers
+                };
+            }
+    
+            var deferred = $q.defer();
+    
+            $http(options).then(function (response) {
+                if (response !== null && response !== undefined && response.data.statusCode !== null && response.data.statusCode !== undefined && response.data.statusCode === 201) {
+                    deferred.resolve(response);
+                }
+                else {
+                    if (response !== null && response !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                        deferred.resolve(response);
+                    }
+                    else {
+                        deferred.reject({ status: false, message: response.data.message });
+                    }
+                }
+            }, function (error) {
+                if (error.data !== null && error.data.statusCode === 190) {
+                    return false;
+                 }
+                 else {
+                     deferred.reject(_getError(error));
+                 }
+            });
+    
+            return deferred.promise;
+        };
+// delete
+var _delete = function (url, dataJson, headers) {
+    
+            var options = {
+                url: url,
+                method: 'DELETE',
+                data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                headers: {
+                    'Content-type': 'application/json;charset=utf-8'
+                }
+            };
+    
+            if (headers !== null && headers !== undefined) {
+                options = {
+                    url: url,
+                    method: 'DELETE',
+                    data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
+                    headers: headers
+                };
+            }
+    
+            var deferred = $q.defer();
+    
+            $http(options).then(function (response) {
+                if (response !== null && response !== undefined && response.data.statusCode !== null && response.data.statusCode !== undefined && response.data.statusCode === 201) {
+                    deferred.resolve(response);
+                }
+                else {
+                    if (response !== null && response !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                        deferred.resolve(response);
+                    }
+                    else {
+                        deferred.reject({ status: false, message: response.data.message });
+                    }
+                }
+            }, function (error) {
+                if (error.data !== null && error.data.statusCode === 190) {
+                    return false;
+                 }
+                 else {
+                     deferred.reject(_getError(error));
+                 }
+            });
+    
+            return deferred.promise;
+        };
+// get errror function
+var _getError = function (error) {
+    
+            var status = error.status;
+    
+            if (error.data !== null && error.data.statusCode !== null && error.data.statusCode !== undefined) {
+                return { status: false, statusCode: error.data.statusCode, message: error.data.message };
+            }
+    
+            if (error.data !== null && error.data.errorCode !== null && error.data.errorCode !== undefined) {
+                return { status: false, statusCode: error.data.statusCode, message: error.data.errorMessage };
+            }
+    
+            switch (status) {
+                default:
+                    return { status: false, statusCode: -1, message: constants.messages.networkError };
+            }
+        };
+// return
+            apiHelperFactory.get = _get;
+            apiHelperFactory.post = _post;
+            apiHelperFactory.delete = _delete;
+            apiHelperFactory.put = _put;
+
+            return apiHelperFactory;
+}]);
+angular.module('helloWorldApp')
+    .factory('homeServices',['apiHelper','$q', function(apiHelper, $q){
+        var homeServicesFactory = {};
+
+        var _classification = function(data){
+            var deferred = $q.defer();
+
+            var url = "http://localhost:3000/api/classification";
+
+            apiHelper.post(url, data).then(function(response){
+                deferred.resolve({status: true, data: response.data.result, statusCode: response.data.statusCode});
+            }, function(error){
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+        };
+
+        homeServicesFactory.classification = _classification;
+
+        return homeServicesFactory;
+    }])

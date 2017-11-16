@@ -1,9 +1,9 @@
 angular.module('helloWorldApp', [
-    'ngRoute'
+    'ngRoute','apiHelper'
 ])
 .config([
     '$routeProvider',
-    function($routeProvider) {
+    function($routeProvider, apiHelper) {
         $routeProvider
             .when('/', {
                 templateUrl: 'views/home.html',
