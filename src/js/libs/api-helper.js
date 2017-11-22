@@ -91,6 +91,45 @@ var _post = function (url, dataJson, headers) {
     
             return deferred.promise;
         };
+
+/// post from qnamaker.ai
+var _postQnA = function (url, dataJson, headers){
+            var options = {
+                url: url,
+                method: 'POST',
+                data: dataJson === null || dataJson === undefined ? null: JSON.stringify(dataJson),
+                headers: {
+                    'Content-type': 'application/json; charset= urf-8',
+                    'Ocp-Apim-Subscription-Key': '16ae95a25ba448bb87d5c5b09196b3d8'
+                }
+            };
+
+          
+            var deferred = $q.defer();
+            
+                    $http(options).then(function (response) {
+                        if (response !== null && response !== undefined && response.data.statusCode !== null && response.data.statusCode !== undefined && response.data.statusCode === 201) {
+                            deferred.resolve(response);
+                        }
+                        else {
+                            if (response !== null && response !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                                deferred.resolve(response);
+                            }
+                            else {
+                                deferred.reject({ status: false, message: response.data.message });
+                            }
+                        }
+                    }, function (error) {
+                        if (error.data !== null && error.data.statusCode === 190) {
+                            return false;
+                         }
+                         else {
+                             deferred.reject(_getError(error));
+                         }
+                    });
+            
+                    return deferred.promise;
+};
 // put
 var _put = function (url, dataJson, headers) {
     
@@ -204,6 +243,7 @@ var _getError = function (error) {
 // return
             apiHelperFactory.get = _get;
             apiHelperFactory.post = _post;
+            apiHelperFactory.postQnA =  _postQnA;
             apiHelperFactory.delete = _delete;
             apiHelperFactory.put = _put;
 

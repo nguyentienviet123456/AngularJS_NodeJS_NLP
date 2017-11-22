@@ -117,7 +117,8 @@ angular.module('helloWorldApp')
           $scope.final_transcript = capitalize($scope.final_transcript);
           $scope.final_span = linebreak($scope.final_transcript);
           $scope.interim_span = linebreak(interim_transcript);
-          $("#final_span").html($scope.final_transcript);
+          console.log($scope.final_transcript);
+           $("#final_span").html($scope.final_transcript);
           if($scope.final_transcript || interim_transcript){
             $scope.inlineBlock = true;
           }
@@ -133,7 +134,7 @@ angular.module('helloWorldApp')
           recognition.start();
           ignore_onend = false;
           $scope.final_span = '';
-          $("#final_span").html('');
+           $("#final_span").html('');
           $scope.interim_span = '';
           $scope.srcImage = "images/mic-animate.gif";
           $scope.infoAllow = true;
@@ -142,7 +143,9 @@ angular.module('helloWorldApp')
         }
 
         $scope.getClassification = function(){
+          $scope.isLoading = true;
           homeServices.classification({text: $scope.final_transcript}).then(function(response){
+            $scope.isLoading = false;
             if(response.data !== null && response.data !== undefined){
               $scope.model = response.data;
               console.log( $scope.model);
@@ -151,6 +154,34 @@ angular.module('helloWorldApp')
             return false;
           });
         };
+
+        $scope.getSegmentation = function(){
+          $scope.isLoading2 = true;
+          homeServices.segmentation({text: $scope.final_transcript}).then(function(response){
+            $scope.isLoading2 = false;
+            if(response.data !== null && response.data !== undefined){
+              $scope.model2 = response.data;
+              console.log( $scope.model2);
+            };
+          }, function( err){
+            return false;
+          });
+        };
+        //
+        $scope.getAnswer = function(){
+          $scope.isloading3 = true;
+          homeServices.getAnswer({"question": "thầy Long"}).then(function(response){
+            $scope.isloading3 = false;
+            if(response.data !== null && response.data !== undefined){
+              $scope.model3 = response.data;
+              console.log($scope.model3);
+            };
+          }, function(error){
+            return false;
+            console.log("error");
+          });
+        };
+        //
       }
     }
 ]);

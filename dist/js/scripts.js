@@ -35250,7 +35250,8 @@ angular.module('helloWorldApp')
           $scope.final_transcript = capitalize($scope.final_transcript);
           $scope.final_span = linebreak($scope.final_transcript);
           $scope.interim_span = linebreak(interim_transcript);
-          $("#final_span").html($scope.final_transcript);
+          console.log($scope.final_transcript);
+           $("#final_span").html($scope.final_transcript);
           if($scope.final_transcript || interim_transcript){
             $scope.inlineBlock = true;
           }
@@ -35266,7 +35267,7 @@ angular.module('helloWorldApp')
           recognition.start();
           ignore_onend = false;
           $scope.final_span = '';
-          $("#final_span").html('');
+           $("#final_span").html('');
           $scope.interim_span = '';
           $scope.srcImage = "images/mic-animate.gif";
           $scope.infoAllow = true;
@@ -35275,7 +35276,9 @@ angular.module('helloWorldApp')
         }
 
         $scope.getClassification = function(){
+          $scope.isLoading = true;
           homeServices.classification({text: $scope.final_transcript}).then(function(response){
+            $scope.isLoading = false;
             if(response.data !== null && response.data !== undefined){
               $scope.model = response.data;
               console.log( $scope.model);
@@ -35284,6 +35287,34 @@ angular.module('helloWorldApp')
             return false;
           });
         };
+
+        $scope.getSegmentation = function(){
+          $scope.isLoading2 = true;
+          homeServices.segmentation({text: $scope.final_transcript}).then(function(response){
+            $scope.isLoading2 = false;
+            if(response.data !== null && response.data !== undefined){
+              $scope.model2 = response.data;
+              console.log( $scope.model2);
+            };
+          }, function( err){
+            return false;
+          });
+        };
+        //
+        $scope.getAnswer = function(){
+          $scope.isloading3 = true;
+          homeServices.getAnswer({"question": "thầy Long"}).then(function(response){
+            $scope.isloading3 = false;
+            if(response.data !== null && response.data !== undefined){
+              $scope.model3 = response.data;
+              console.log($scope.model3);
+            };
+          }, function(error){
+            return false;
+            console.log("error");
+          });
+        };
+        //
       }
     }
 ]);
@@ -35381,6 +35412,45 @@ var _post = function (url, dataJson, headers) {
     
             return deferred.promise;
         };
+
+/// post from qnamaker.ai
+var _postQnA = function (url, dataJson, headers){
+            var options = {
+                url: url,
+                method: 'POST',
+                data: dataJson === null || dataJson === undefined ? null: JSON.stringify(dataJson),
+                headers: {
+                    'Content-type': 'application/json; charset= urf-8',
+                    'Ocp-Apim-Subscription-Key': '16ae95a25ba448bb87d5c5b09196b3d8'
+                }
+            };
+
+          
+            var deferred = $q.defer();
+            
+                    $http(options).then(function (response) {
+                        if (response !== null && response !== undefined && response.data.statusCode !== null && response.data.statusCode !== undefined && response.data.statusCode === 201) {
+                            deferred.resolve(response);
+                        }
+                        else {
+                            if (response !== null && response !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                                deferred.resolve(response);
+                            }
+                            else {
+                                deferred.reject({ status: false, message: response.data.message });
+                            }
+                        }
+                    }, function (error) {
+                        if (error.data !== null && error.data.statusCode === 190) {
+                            return false;
+                         }
+                         else {
+                             deferred.reject(_getError(error));
+                         }
+                    });
+            
+                    return deferred.promise;
+};
 // put
 var _put = function (url, dataJson, headers) {
     
@@ -35494,6 +35564,7 @@ var _getError = function (error) {
 // return
             apiHelperFactory.get = _get;
             apiHelperFactory.post = _post;
+            apiHelperFactory.postQnA =  _postQnA;
             apiHelperFactory.delete = _delete;
             apiHelperFactory.put = _put;
 
@@ -35517,7 +35588,37 @@ angular.module('helloWorldApp')
             return deferred.promise;
         };
 
-        homeServicesFactory.classification = _classification;
 
+        var _segmentation = function(data){
+            var deferred = $q.defer();
+            
+                        var url = "http://localhost:3000/api/classification2";
+            
+                        apiHelper.post(url, data).then(function(response){
+                            deferred.resolve({status: true, data: response.data.result, statusCode: response.data.statusCode});
+                        }, function(error){
+                            deferred.reject(error);
+                        });
+            
+                        return deferred.promise; 
+        };
+
+        var _getAnswer = function(data){
+            var deferred = $q.defer();
+                var url = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/e46248d7-84f4-47bd-9aef-727189c30707/generateAnswer";
+
+                apiHelper.postQnA(url, data). then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+        };
+
+
+        homeServicesFactory.classification = _classification;
+        homeServicesFactory.segmentation = _segmentation;
+        homeServicesFactory.getAnswer = _getAnswer;
         return homeServicesFactory;
     }])

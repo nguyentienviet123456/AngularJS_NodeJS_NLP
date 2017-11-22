@@ -23,12 +23,18 @@
 </div>
 <div id="results">
   <span id="final_span" ng-bind="final_transcript" class="final"></span>
-  <span id="interim_span" ng-bind="interim_span" class="interim"></span>
   <p>
 </div>
-<p data-ng-bind="final_span"></p>
-  <input data-ng-model="final_span"/>
-  <button data-ng-click="getClassification()"></button>
+  <button data-ng-click="getClassification()">Classification</button>
+  <span data-ng-show="isLoading">loading...</span>
+  {{model}}
+  <br/>
+  <button data-ng-click="getSegmentation()">Classification2</button>
+  <span data-ng-show="isLoading2">loading...</span>
+  {{model2}}
+  <button data-ng-click="getAnswer()">Answer</button>
+  <span data-ng-show="isloading3">loading...</span>
+  {{model3}}
 <div class="center">
   <div class="sidebyside" style="text-align:right">
     <button class="button" data-ng-click="copyButton()">
