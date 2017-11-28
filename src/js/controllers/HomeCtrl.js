@@ -1,7 +1,7 @@
-angular.module('helloWorldApp')
+angular.module('helloWorldApp' )
 .controller('HomeCtrl', [
-    '$scope','homeServices',
-    function($scope, homeServices) {
+    '$scope','homeServices','$sce',
+    function($scope, homeServices, $sce) {
       $scope.srcImage = "images/mic.gif";
       //startregion variable
       var ignore_onend;
@@ -87,14 +87,7 @@ angular.module('helloWorldApp')
             return;
           }
           // TODO: set false all show
-          $scope.infoStart = false;
-          $scope.infoSpeachNow = false;
-          $scope.infoNoSpeech = false;
-          $scope.infoNoMicroPhone = false;
-          $scope.infoAllow = false;
-          $scope.infoDenied = false;
-          $scope.infoBlocled = false;
-          $scope.infoUpgrade = false;
+         
           // endTODO
           if(window.getSelection){
             window.getSelection().removeAllRanges();
@@ -170,11 +163,22 @@ angular.module('helloWorldApp')
         //
         $scope.getAnswer = function(){
           $scope.isloading3 = true;
-          homeServices.getAnswer({"question": "thầy Long"}).then(function(response){
+          homeServices.getAnswer({"question": "Khoa Công nghệ thông tin có những bộ môn nào?"}).then(function(response){
             $scope.isloading3 = false;
             if(response.data !== null && response.data !== undefined){
-              $scope.model3 = response.data;
-              console.log($scope.model3);
+              $scope.answers = response.data.answers;
+              var datas = [];
+              datas = $scope.answers;
+              for(var i = 0; i < datas.length; i++){
+                datas[i].answer = datas[i].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+              };
+              $scope.answers = datas;
+            //  $scope.answers = $scope.answers[0].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+              $scope.toTrustedHTML = function( html ){
+                return $sce.trustAsHtml( html );
+            }
+              //console.log($scope.answers[0].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#244;/g, "ô").replace(/&#253;/g, "ý").replace(/&#243;/g, "ó").replace(/&#234;/g, "ê"));
+             console.log($scope.answers);
             };
           }, function(error){
             return false;

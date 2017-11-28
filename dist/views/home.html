@@ -1,54 +1,64 @@
-<h1 class="center" id="headline">
-  <a href="http://dvcs.w3.org/hg/speech-api/raw-file/tip/speechapi.html">
-          Web Speech API</a> Demonstration</h1>
-<div id="info">
-  <p data-ng-show="infoStart">Click on the microphone icon and begin speaking.</p>
-  <p data-ng-show="infoSpeechNow">Speak now.</p>
-  <p data-ng-show="infoNoSpeech">No speech was detected. You may need to adjust your
-    <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
-            microphone settings</a>.</p>
-  <p data-ng-show="infoNoMicroPhone">
-    No microphone was found. Ensure that a microphone is installed and that
-    <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
-          microphone settings</a> are configured correctly.</p>
-  <p data-ng-show="infoAllow">Click the "Allow" button above to enable your microphone.</p>
-  <p data-ng-show="infoDenied">Permission to use microphone was denied.</p>
-  <p data-ng-show="infoBlocked">Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream</p>
-  <p data-ng-show="infoUpgrade">Web Speech API is not supported by this browser. Upgrade to <a href="//www.google.com/chrome">Chrome</a> version 25 or
-    later.</p>
-</div>
-<div class="right">
-  <button>
-          <img  ng-src="{{srcImage}}" alt="Start" ng-click="startButton($event)"></button>
-</div>
-<div id="results">
-  <span id="final_span" ng-bind="final_transcript" class="final"></span>
-  <p>
-</div>
-  <button data-ng-click="getClassification()">Classification</button>
-  <span data-ng-show="isLoading">loading...</span>
-  {{model}}
-  <br/>
-  <button data-ng-click="getSegmentation()">Classification2</button>
-  <span data-ng-show="isLoading2">loading...</span>
-  {{model2}}
-  <button data-ng-click="getAnswer()">Answer</button>
-  <span data-ng-show="isloading3">loading...</span>
-  {{model3}}
-<div class="center">
-  <div class="sidebyside" style="text-align:right">
-    <button class="button" data-ng-click="copyButton()">
-            Copy and Paste</button>
-    <div class="info">
-      Press Control-C to copy text.<br>(Command-C on Mac.)
+<div class="container">
+  <h1 class="center" id="headline">
+    <a href="http://dvcs.w3.org/hg/speech-api/raw-file/tip/speechapi.html">
+            Web Speech API</a> Demonstration</h1>
+  <div id="info">
+    <p data-ng-show="infoStart">Click on the microphone icon and begin speaking.</p>
+    <p data-ng-show="infoSpeechNow">Speak now.</p>
+    <p data-ng-show="infoNoSpeech">No speech was detected. You may need to adjust your
+      <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
+              microphone settings</a>.</p>
+    <p data-ng-show="infoNoMicroPhone">
+      No microphone was found. Ensure that a microphone is installed and that
+      <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
+            microphone settings</a> are configured correctly.</p>
+    <p data-ng-show="infoAllow">Click the "Allow" button above to enable your microphone.</p>
+    <p data-ng-show="infoDenied">Permission to use microphone was denied.</p>
+    <p data-ng-show="infoBlocked">Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream</p>
+    <p data-ng-show="infoUpgrade">Web Speech API is not supported by this browser. Upgrade to <a href="//www.google.com/chrome">Chrome</a> version 25 or
+      later.</p>
+  </div>
+  <div class="row">
+    <div class="right">
+      <button>
+              <img  ng-src="{{srcImage}}" alt="Start" ng-click="startButton($event)"></button>
+    </div>
+    <div id="results">
+      <span id="final_span" ng-bind="final_transcript" class="final"></span>
+      <p>
     </div>
   </div>
-  <div class="sidebyside">
-    <button class="button" data-ng-click="emailButton()">
-            Create Email</button>
-    <div class="info">
-      Text sent to default email application.<br> (See chrome://settings/handlers to change.)
-    </div>
+  <div class="row">
+    <button class="btn btn-primary" data-ng-click="getClassification()">Classification</button>
+    <span data-ng-show="isLoading">loading...</span>
+    {{model}}
+    <br/>
+    <button class="btn btn-primary" data-ng-click="getSegmentation()">Classification2</button>
+    <span data-ng-show="isLoading2">loading...</span>
+    {{model2}}
+    <br/>                                                                                                                                                                                                                                          
+    <button class="btn btn-info" data-ng-click="getAnswer()">Answer</button>
+    <span data-ng-show="isloading3">loading...</span>
+    <ul style="list-style-type:none" data-ng-repeat="answer in answers">
+      <li ng-bind-html='toTrustedHTML( answer.answer )'>
+      </li>
+    </ul>
   </div>
-  <p>
+  <div class="center">
+    <div class="sidebyside" style="text-align:right">
+      <button class="button" data-ng-click="copyButton()">
+              Copy and Paste</button>
+      <div class="info">
+        Press Control-C to copy text.<br>(Command-C on Mac.)
+      </div>
+    </div>
+    <div class="sidebyside">
+      <button class="button" data-ng-click="emailButton()">
+              Create Email</button>
+      <div class="info">
+        Text sent to default email application.<br> (See chrome://settings/handlers to change.)
+      </div>
+    </div>
+    <p>
+  </div>
 </div>
