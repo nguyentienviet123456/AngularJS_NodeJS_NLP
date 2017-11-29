@@ -35296,7 +35296,7 @@ angular.module('helloWorldApp' )
         //
         $scope.getAnswer = function(){
           $scope.isloading3 = true;
-          homeServices.getAnswer({"question": "Khoa Công nghệ thông tin có những bộ môn nào?"}).then(function(response){
+          homeServices.getAnswer({"question": "thầy lê sĩ vinh"}).then(function(response){
             $scope.isloading3 = false;
             if(response.data !== null && response.data !== undefined){
               $scope.answers = response.data.answers;
