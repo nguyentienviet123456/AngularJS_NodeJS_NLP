@@ -44,9 +44,37 @@ angular.module('helloWorldApp')
                 return deferred.promise;
         };
 
+        var _createNewPair = function(data){
+            var deferred = $q.defer();
+                var url = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/e46248d7-84f4-47bd-9aef-727189c30707";
 
+                apiHelper.patch(url, data). then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+
+        } 
+
+        var _publish = function(){
+            var deferred = $q.defer();
+            var url = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/e46248d7-84f4-47bd-9aef-727189c30707";
+
+            apiHelper.put(url).then(function(response){
+                deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+            }, function(error){
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+
+        }
         homeServicesFactory.classification = _classification;
         homeServicesFactory.segmentation = _segmentation;
         homeServicesFactory.getAnswer = _getAnswer;
+        homeServicesFactory.createNewPair = _createNewPair;
+        homeServicesFactory.publish = _publish;
         return homeServicesFactory;
     }])

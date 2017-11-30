@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="row">
+        <div class="center">
+            <h1>
+                Welcome your contribution
+            </h1>
+        </div>
+        <br>
+        <div class="row center">
+            <div>
+                <input class="w3-input" type="text" data-ng-model="name" placeholder="Type your title of pairs here">
+            </div>
+        </div>
+        <div class="row">
+            <div id="results" class="col-md-6">
+                <input class="w3-input" type="text" data-ng-model="question" placeholder="Type your question here">
+            </div>
+            <div id="results" class="col-md-6">
+                <textarea class="form-control" rows="5" id="comment" data-ng-model="answer" placeholder="Type your answer here"></textarea>
+            </div>
+        </div>
+        <div class="center">
+            <button class="btn btn-primary" data-ng-click="contribute()">{{buttonName}}</button>
+        </div>
+        <div class="center">
+            <button class="btn btn-primary" data-ng-click="publish()">publish</button>
+        </div>
+        <div class="row center">
+            <h2>
+                    If your answer is list, we recommend you should type your answer by html tag
+            </h2>
+            <h4>
+                Click button below to see results
+            </h4>
+            <button class="btn btn-primary" data-ng-click="convertHTML()">Results</button>
+            <div>
+                <p ng-bind-html='toTrustedHTML( answer_html )'></p>
+            </div>
+        </div>
+    </div>
+</div>

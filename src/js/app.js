@@ -8,6 +8,10 @@ angular.module('helloWorldApp', [
             .when('/', {
                 templateUrl: 'views/home.html',
                 controller: 'HomeCtrl'
+            })
+            .when('/contribute', {
+                templateUrl: 'views/contribute.html',
+                controller: 'ContributeCtrl',
             });
     }
 ]);

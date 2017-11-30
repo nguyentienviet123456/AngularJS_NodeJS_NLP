@@ -1,7 +1,7 @@
 angular.module('helloWorldApp' )
 .controller('HomeCtrl', [
-    '$scope','homeServices','$sce',
-    function($scope, homeServices, $sce) {
+    '$scope','homeServices','$sce','$window' ,
+    function($scope, homeServices, $sce, $window) {
       $scope.srcImage = "images/mic.gif";
       //startregion variable
       var ignore_onend;
@@ -187,6 +187,10 @@ angular.module('helloWorldApp' )
           });
         };
         //
+
+        $scope.goContribute = function(){
+          $window.location.href = '#!/contribute';
+        };
       }
     }
 ]);

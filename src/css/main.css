@@ -75,3 +75,8 @@
     background-color:transparent;
     padding: 0;
   }
+  hr {
+    color: #f00;
+    background-color: #f00;
+    height: 2px;
+  }

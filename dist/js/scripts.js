@@ -35127,14 +35127,62 @@ angular.module('helloWorldApp', [
             .when('/', {
                 templateUrl: 'views/home.html',
                 controller: 'HomeCtrl'
+            })
+            .when('/contribute', {
+                templateUrl: 'views/contribute.html',
+                controller: 'ContributeCtrl',
             });
     }
 ]);
 
 angular.module('helloWorldApp' )
+.controller('ContributeCtrl', [
+    '$scope','homeServices','$sce','$window' ,
+    function($scope, homeServices, $sce, $window) {
+        $scope.question = "";
+        $scope.answer = "";
+        $scope.answer_html = "";
+        $scope.qnaPairs = [{
+            answer: '',
+            question: ''
+        }];
+        $scope.buttonName = "Contribute"
+
+        $scope.contribute = function () {
+            $scope.buttonName = "Contributing ...";
+            $scope.qnaPairs[0].answer = $scope.answer;
+            $scope.qnaPairs[0].question = $scope.question;
+            var add = {
+                "qnaPairs": $scope.qnaPairs
+            };
+            homeServices.createNewPair({"add": add}).then(function(response){
+            $scope.buttonName = "Done !";
+            }, function(error){
+                return false;
+            });
+        };
+        $scope.publish = function(){
+            homeServices.publish().then(function(response){
+             $scope.buttonName = "Done !";
+             }, function(error){
+                 return false;
+             });
+        };
+        $scope.convertHTML = function () {
+            $scope.answer_html = $scope.answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+            $scope.toTrustedHTML = function( html ){
+                return $sce.trustAsHtml( html );
+        };
+
+      
+    }
+}
+]);
+
+angular.module('helloWorldApp' )
 .controller('HomeCtrl', [
-    '$scope','homeServices','$sce',
-    function($scope, homeServices, $sce) {
+    '$scope','homeServices','$sce','$window' ,
+    function($scope, homeServices, $sce, $window) {
       $scope.srcImage = "images/mic.gif";
       //startregion variable
       var ignore_onend;
@@ -35320,6 +35368,10 @@ angular.module('helloWorldApp' )
           });
         };
         //
+
+        $scope.goContribute = function(){
+          $window.location.href = '#!/contribute';
+        };
       }
     }
 ]);
@@ -35456,6 +35508,44 @@ var _postQnA = function (url, dataJson, headers){
             
                     return deferred.promise;
 };
+// pathch
+var _patch = function (url, dataJson, headers){
+    var options = {
+        url: url,
+        method: 'PATCH',
+        data: dataJson === null || dataJson === undefined ? null: JSON.stringify(dataJson),
+        headers: {
+            'Content-type': 'application/json; charset= urf-8',
+            'Ocp-Apim-Subscription-Key': '16ae95a25ba448bb87d5c5b09196b3d8'
+        }
+    };
+
+  
+    var deferred = $q.defer();
+    
+            $http(options).then(function (response) {
+                if (response !== null && response !== undefined && response.data.statusCode !== null && response.data.statusCode !== undefined && response.data.statusCode === 201) {
+                    deferred.resolve(response);
+                }
+                else {
+                    if (response !== null && response !== undefined && (response.data.statusCode === null || response.data.statusCode === undefined)) {
+                        deferred.resolve(response);
+                    }
+                    else {
+                        deferred.reject({ status: false, message: response.data.message });
+                    }
+                }
+            }, function (error) {
+                if (error.data !== null && error.data.statusCode === 190) {
+                    return false;
+                 }
+                 else {
+                     deferred.reject(_getError(error));
+                 }
+            });
+    
+            return deferred.promise;
+};
 // put
 var _put = function (url, dataJson, headers) {
     
@@ -35464,7 +35554,8 @@ var _put = function (url, dataJson, headers) {
                 method: 'PUT',
                 data: dataJson === null || dataJson === undefined ? null : JSON.stringify(dataJson),
                 headers: {
-                    'Content-type': 'application/json;charset=utf-8'
+                    'Content-type': 'application/json;charset=utf-8',
+                    'Ocp-Apim-Subscription-Key': '16ae95a25ba448bb87d5c5b09196b3d8'
                 }
             };
     
@@ -35572,6 +35663,7 @@ var _getError = function (error) {
             apiHelperFactory.postQnA =  _postQnA;
             apiHelperFactory.delete = _delete;
             apiHelperFactory.put = _put;
+            apiHelperFactory.patch =  _patch;
 
             return apiHelperFactory;
 }]);
@@ -35636,9 +35728,37 @@ angular.module('helloWorldApp')
                 return deferred.promise;
         };
 
+        var _createNewPair = function(data){
+            var deferred = $q.defer();
+                var url = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/e46248d7-84f4-47bd-9aef-727189c30707";
 
+                apiHelper.patch(url, data). then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+
+        } 
+
+        var _publish = function(){
+            var deferred = $q.defer();
+            var url = "https://westus.api.cognitive.microsoft.com/qnamaker/v2.0/knowledgebases/e46248d7-84f4-47bd-9aef-727189c30707";
+
+            apiHelper.put(url).then(function(response){
+                deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+            }, function(error){
+                deferred.reject(error);
+            });
+
+            return deferred.promise;
+
+        }
         homeServicesFactory.classification = _classification;
         homeServicesFactory.segmentation = _segmentation;
         homeServicesFactory.getAnswer = _getAnswer;
+        homeServicesFactory.createNewPair = _createNewPair;
+        homeServicesFactory.publish = _publish;
         return homeServicesFactory;
     }])

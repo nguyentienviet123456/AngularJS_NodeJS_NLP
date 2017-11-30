@@ -39,14 +39,18 @@
   <div class="row">
     <div class="row">
       <div id="results" class="col-md-6">
-        <div class="right">
+        <div class="left">
           <buttongi>
             <img class="img-circle" style="border-radius: 50%" ng-src="{{srcImage}}" alt="Start" ng-click="startButton($event)">
           </button>
         </div>
-        <span  id="final_span" data-ng-model="final_transcript" class="final"></span>
+        <div  id="final_span" data-ng-model="final_transcript" class="final" style="height: 3px"></div>
+        <hr style="color: #281758;
+        background-color: #241B70;
+        height: 1px;">
+        <input class="w3-input" type="text" data-ng-model="final_transcript" placeholder="Type your question here">
       </div>
-      <div id="results" class="col-md-6">
+      <div id="results" class="col-md-6" style="min-height: 161px;">
         <div class="left">
           <button class="btn btn-info" data-ng-click="getAnswer()">Answer</button>
           <span data-ng-show="isloading3">loading...</span>
@@ -57,5 +61,12 @@
         </ul>
       </div>
     </div>
+  </div>
+  <div class="center">
+    <h2>
+      Do you want to contribute to make more knowledge base
+    </h2>
+    <br>
+    <button class="btn btn-primary" data-ng-click="goContribute()">Click Here To Contribute</button>
   </div>
 </div>
