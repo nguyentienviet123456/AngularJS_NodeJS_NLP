@@ -128,6 +128,7 @@ angular.module('helloWorldApp' )
           ignore_onend = false;
           $scope.final_span = '';
            $("#final_span").html('');
+           $("#final_span").html($scope.final_transcript);
           $scope.interim_span = '';
           $scope.srcImage = "images/mic-animate.gif";
           $scope.infoAllow = true;
@@ -163,7 +164,7 @@ angular.module('helloWorldApp' )
         //
         $scope.getAnswer = function(){
           $scope.isloading3 = true;
-          homeServices.getAnswer({"question": "thầy lê sĩ vinh"}).then(function(response){
+          homeServices.getAnswer({"question": $scope.final_transcript}).then(function(response){
             $scope.isloading3 = false;
             if(response.data !== null && response.data !== undefined){
               $scope.answers = response.data.answers;

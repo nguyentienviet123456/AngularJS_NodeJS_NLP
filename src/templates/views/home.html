@@ -40,11 +40,11 @@
     <div class="row">
       <div id="results" class="col-md-6">
         <div class="right">
-          <button>
+          <buttongi>
             <img class="img-circle" style="border-radius: 50%" ng-src="{{srcImage}}" alt="Start" ng-click="startButton($event)">
           </button>
         </div>
-        <span id="final_span" ng-bind="final_transcript" class="final"></span>
+        <span  id="final_span" data-ng-model="final_transcript" class="final"></span>
       </div>
       <div id="results" class="col-md-6">
         <div class="left">
@@ -57,33 +57,5 @@
         </ul>
       </div>
     </div>
-
-  </div>
-  <div class="row">
-    <button class="btn btn-primary" data-ng-click="getClassification()">Classification</button>
-    <span data-ng-show="isLoading">loading...</span> {{model}}
-    <br/>
-    <button class="btn btn-primary" data-ng-click="getSegmentation()">Classification2</button>
-    <span data-ng-show="isLoading2">loading...</span> {{model2}}
-    <br/>
-    <button class="btn btn-info" data-ng-click="getAnswer()">Answer</button>
-    <span data-ng-show="isloading3">loading...</span>
-  </div>
-  <div class="center">
-    <div class="sidebyside" style="text-align:right">
-      <button class="button" data-ng-click="copyButton()">
-              Copy and Paste</button>
-      <div class="info">
-        Press Control-C to copy text.<br>(Command-C on Mac.)
-      </div>
-    </div>
-    <div class="sidebyside">
-      <button class="button" data-ng-click="emailButton()">
-              Create Email</button>
-      <div class="info">
-        Text sent to default email application.<br> (See chrome://settings/handlers to change.)
-      </div>
-    </div>
-    <p>
   </div>
 </div>
