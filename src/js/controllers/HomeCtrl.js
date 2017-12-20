@@ -172,7 +172,12 @@ angular.module('helloWorldApp' )
               datas = $scope.answers;
               for(var i = 0; i < datas.length; i++){
                 datas[i].answer = datas[i].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+                if(datas[i].score < 70){
+                  datas[i].answer = "no answer with this question !"
+                  $scope.showAddQuestionButton = true;
+                }
               };
+              
               $scope.answers = datas;
             //  $scope.answers = $scope.answers[0].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
               $scope.toTrustedHTML = function( html ){
@@ -180,6 +185,7 @@ angular.module('helloWorldApp' )
             }
               //console.log($scope.answers[0].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#244;/g, "ô").replace(/&#253;/g, "ý").replace(/&#243;/g, "ó").replace(/&#234;/g, "ê"));
              console.log($scope.answers);
+             
             };
           }, function(error){
             return false;
@@ -191,6 +197,17 @@ angular.module('helloWorldApp' )
         $scope.goContribute = function(){
           $window.location.href = '#!/contribute';
         };
+
+        $scope.goListQuestion = function(){
+          $window.location.href = '#!/questions';
+        }  
+        $scope.addToListQuestion = function(){
+          homeServices.addQuestion({"question": $scope.final_transcript}).then(function(response){
+
+          }, function(error){
+
+          })
+        }
       }
     }
 ]);

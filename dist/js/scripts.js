@@ -35428,53 +35428,90 @@ angular.module('helloWorldApp', [
             .when('/contribute', {
                 templateUrl: 'views/contribute.html',
                 controller: 'ContributeCtrl',
+            })
+            .when('/questions',{
+                templateUrl: 'views/questions.html',
+                controller: 'ContributeCtrl',
             });
     }
-]);
+])
+.filter('startFrom', function() {
+    return function(input, start) {
+        if (!input || !input.length) { return; }
+        start = +start; //parse to int
+        return input.slice(start);
+    }
+});
 
-angular.module('helloWorldApp' )
-.controller('ContributeCtrl', [
-    '$scope','homeServices','$sce','$window' ,
-    function($scope, homeServices, $sce, $window) {
-        $scope.question = "";
-        $scope.answer = "";
-        $scope.answer_html = "";
-        $scope.qnaPairs = [{
-            answer: '',
-            question: ''
-        }];
-        $scope.buttonName = "Contribute"
 
-        $scope.contribute = function () {
-            $scope.buttonName = "Contributing ...";
-            $scope.qnaPairs[0].answer = $scope.answer;
-            $scope.qnaPairs[0].question = $scope.question;
-            var add = {
-                "qnaPairs": $scope.qnaPairs
+angular.module('helloWorldApp')
+    .controller('ContributeCtrl', [
+        '$scope', 'homeServices', '$sce', '$window', '$filter',
+        function ($scope, homeServices, $sce, $window, $filter) {
+            $scope.question = "";
+            $scope.answer = "";
+            $scope.answer_html = "";
+            $scope.qnaPairs = [{
+                answer: '',
+                question: ''
+            }];
+            $scope.buttonName = "Contribute"
+
+            var getAllQuestions = function () {
+                console.log("get list questions");
+                homeServices.getAllQuestions().then(function (response) {
+                    var _listQuestions = [];
+                    _listQuestions = response.data.result;
+                    $scope.listQuestions = angular.copy(_listQuestions);
+                }, function (err) {
+
+                });
+            }
+
+            getAllQuestions();
+
+            $scope.contribute = function () {
+                $scope.buttonName = "Contributing ...";
+                $scope.qnaPairs[0].answer = $scope.answer;
+                $scope.qnaPairs[0].question = $scope.question;
+                var add = {
+                    "qnaPairs": $scope.qnaPairs
+                };
+                homeServices.createNewPair({ "add": add }).then(function (response) {
+                    $scope.buttonName = "Done !";
+                }, function (error) {
+                    return false;
+                });
             };
-            homeServices.createNewPair({"add": add}).then(function(response){
-            $scope.buttonName = "Done !";
-            }, function(error){
-                return false;
-            });
-        };
-        $scope.publish = function(){
-            homeServices.publish().then(function(response){
-             $scope.buttonName = "Done !";
-             }, function(error){
-                 return false;
-             });
-        };
-        $scope.convertHTML = function () {
-            $scope.answer_html = $scope.answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-            $scope.toTrustedHTML = function( html ){
-                return $sce.trustAsHtml( html );
-        };
-
-      
-    }
-}
-]);
+            $scope.publish = function () {
+                homeServices.publish().then(function (response) {
+                    $scope.buttonName = "Done !";
+                }, function (error) {
+                    return false;
+                });
+            };
+            $scope.convertHTML = function () {
+                $scope.answer_html = $scope.answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+                $scope.toTrustedHTML = function (html) {
+                    return $sce.trustAsHtml(html);
+                };
+            }   
+                
+            $scope.currentPage = 0;
+            $scope.pageSize = 10;
+            $scope.data = [];
+            $scope.q = '';
+            
+            $scope.getData = function () {
+            return $filter('filter')($scope.listQuestions, $scope.q)
+            }
+            
+            $scope.numberOfPages=function(){
+                return Math.ceil($scope.listQuestions.length/$scope.pageSize);                
+            }
+            
+            
+}]);
 
 angular.module('helloWorldApp' )
 .controller('HomeCtrl', [
@@ -35650,7 +35687,12 @@ angular.module('helloWorldApp' )
               datas = $scope.answers;
               for(var i = 0; i < datas.length; i++){
                 datas[i].answer = datas[i].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+                if(datas[i].score < 70){
+                  datas[i].answer = "no answer with this question !"
+                  $scope.showAddQuestionButton = true;
+                }
               };
+              
               $scope.answers = datas;
             //  $scope.answers = $scope.answers[0].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
               $scope.toTrustedHTML = function( html ){
@@ -35658,6 +35700,7 @@ angular.module('helloWorldApp' )
             }
               //console.log($scope.answers[0].answer.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#244;/g, "ô").replace(/&#253;/g, "ý").replace(/&#243;/g, "ó").replace(/&#234;/g, "ê"));
              console.log($scope.answers);
+             
             };
           }, function(error){
             return false;
@@ -35669,6 +35712,17 @@ angular.module('helloWorldApp' )
         $scope.goContribute = function(){
           $window.location.href = '#!/contribute';
         };
+
+        $scope.goListQuestion = function(){
+          $window.location.href = '#!/questions';
+        }  
+        $scope.addToListQuestion = function(){
+          homeServices.addQuestion({"question": $scope.final_transcript}).then(function(response){
+
+          }, function(error){
+
+          })
+        }
       }
     }
 ]);
@@ -36052,10 +36106,36 @@ angular.module('helloWorldApp')
             return deferred.promise;
 
         }
+
+        var _addQuestion = function(data){
+            var deferred = $q.defer();
+            var url = "http://localhost:3000/api/addQuestion";
+
+            apiHelper.post(url, data).then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+        }
+        var _getAllQuestions = function(){
+            var deferred = $q.defer();
+            var url = "http://localhost:3000/api/questions"
+            apiHelper.get(url).then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+        }
         homeServicesFactory.classification = _classification;
         homeServicesFactory.segmentation = _segmentation;
         homeServicesFactory.getAnswer = _getAnswer;
         homeServicesFactory.createNewPair = _createNewPair;
         homeServicesFactory.publish = _publish;
+        homeServicesFactory.addQuestion = _addQuestion;
+        homeServicesFactory.getAllQuestions = _getAllQuestions;
         return homeServicesFactory;
     }])

@@ -71,10 +71,36 @@ angular.module('helloWorldApp')
             return deferred.promise;
 
         }
+
+        var _addQuestion = function(data){
+            var deferred = $q.defer();
+            var url = "http://localhost:3000/api/addQuestion";
+
+            apiHelper.post(url, data).then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+        }
+        var _getAllQuestions = function(){
+            var deferred = $q.defer();
+            var url = "http://localhost:3000/api/questions"
+            apiHelper.get(url).then(function(response){
+                    deferred.resolve({status: true, data: response.data, statusCode: response.data.statusCode});
+                }, function(error){
+                    deferred.reject(error);
+                });
+
+                return deferred.promise;
+        }
         homeServicesFactory.classification = _classification;
         homeServicesFactory.segmentation = _segmentation;
         homeServicesFactory.getAnswer = _getAnswer;
         homeServicesFactory.createNewPair = _createNewPair;
         homeServicesFactory.publish = _publish;
+        homeServicesFactory.addQuestion = _addQuestion;
+        homeServicesFactory.getAllQuestions = _getAllQuestions;
         return homeServicesFactory;
     }])
